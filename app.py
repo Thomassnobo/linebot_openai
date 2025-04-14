@@ -28,11 +28,24 @@ openai.api_key = os.getenv('OPENAI_API_KEY')
 
 def GPT_response(text):
     # 接收回應
-    response = openai.Completion.create(model="gpt-4.1", prompt=text, temperature=0.5, max_tokens=500)
+    response = openai.Completion.create(model="gpt-4", prompt=text, temperature=0.5, max_tokens=500)
     print(response)
     # 重組回應
     answer = response['choices'][0]['text'].replace('。','')
     return answer
+
+def GPT_response(text):
+ # 接收回應
+    response = openai.ChatCompletion.create(
+        model="gpt-4",  # 或 "gpt-4-turbo"
+        messages=[{"role": "user", "content": text}],
+        temperature=0.5,
+        max_tokens=500
+    )
+  #重組回應
+    answer = response['choices'][0]['message']['content']
+    return answer.strip()
+
 
 
 # 監聽所有來自 /callback 的 Post Request
@@ -53,7 +66,7 @@ def callback():
 
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
+def handle_text_message(event):
     msg = event.message.text
     try:
         GPT_answer = GPT_response(msg)
@@ -65,7 +78,7 @@ def handle_message(event):
         
 
 @handler.add(PostbackEvent)
-def handle_message(event):
+def handle_postback_event(event):
     print(event.postback.data)
 
 
